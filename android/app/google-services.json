@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "812292840106",
+    "project_id": "exterior-6fe1a",
+    "storage_bucket": "exterior-6fe1a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812292840106:android:db58153a78b75220a20ed3",
+        "android_client_info": {
+          "package_name": "com.example.exterior"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClfIOHgSHTkZAiEifthuoIKHY-zHZGrZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
