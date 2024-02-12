@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logger/logger.dart';
 import '../models/expense.dart';
 import './expense_item.dart';
 import './dashed_divider.dart';
+import '../models/expense_list_controller.dart';
 
 class ExpenseList extends StatefulWidget {
   /// The list of expenses to display.
-  final List<Expense> expenses;
+  // final List<Expense> expenses;
 
   final void Function(Expense expense)? deleteExpense;
 
   const ExpenseList(
-    this.expenses, {
+      // this.expenses,
+      {
     super.key,
     this.deleteExpense,
   });
@@ -22,17 +26,21 @@ class ExpenseList extends StatefulWidget {
 }
 
 class _ExpenseListState extends State<ExpenseList> {
-  final ScrollController _scrollController = ScrollController();
-  final _maxNumItemsPerPage = 10;
+  final _scrollController = ScrollController();
+  final _maxNumItemsPerPage = 20;
   DocumentSnapshot? _lastDocument;
-  List<Expense> _expenses = [];
+  // List<Expense> _expenses = [];
+
+  final _expenseListController = Get.find<ExpenseListController>();
+  late final _expenses = _expenseListController.expenses;
+  final _logger = Get.find<Logger>();
 
   @override
   void initState() {
     super.initState();
 
     _scrollController.addListener(_scrollListener);
-    _loadExpenses();
+    _expenseListController.loadExpensesFromFirestore();
   }
 
   @override
@@ -78,57 +86,55 @@ class _ExpenseListState extends State<ExpenseList> {
     //   },
     // );
 
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: _expenses.length,
-      itemBuilder: (context, index) {
-        final expense = _expenses[index];
-        return ExpenseItem(
-          expense,
-        );
-      },
-    );
-  }
-
-  _loadExpenses() async {
-    Query query = FirebaseFirestore.instance
-        .collection('Users')
-        .doc('test')
-        .collection('Expenses')
-        .orderBy('date')
-        .limit(_maxNumItemsPerPage);
-
-    if (_lastDocument != null) {
-      query = query.startAfterDocument(_lastDocument!);
-    }
-
-    QuerySnapshot querySnapshot = await query.get();
-
-    if (querySnapshot.docs.length < _maxNumItemsPerPage) {
-      _scrollController.removeListener(_scrollListener);
-    }
-
-    _lastDocument = querySnapshot.docs.last;
-
-    setState(() {
-      _expenses.addAll(querySnapshot.docs.map(Expense.fromDocument).toList());
+    return Obx(() {
+      return ListView.builder(
+        controller: _scrollController,
+        itemCount: _expenses.length,
+        itemBuilder: (context, index) {
+          final expense = _expenses[index];
+          return ExpenseItem(
+            expense,
+            onDismissed: () {
+              _deleteExpenseAt(index);
+            },
+          );
+        },
+      );
     });
   }
 
   _scrollListener() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      _loadExpenses();
+      print('Reached the end of the list. Loading more...');
+      _expenseListController.loadExpensesFromFirestore();
     }
   }
 
   _deleteExpenseAt(int index) {
     // The expense to delete
-    final expense = widget.expenses[index];
+    final expense = _expenses[index];
 
+    // Remove the expense from the list
     setState(() {
-      widget.expenses.removeAt(index);
-      widget.deleteExpense?.call(expense);
+      _expenses.removeAt(index);
+    });
+
+    // Delete the expense from the database
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc('test')
+        .collection('Expenses')
+        .doc(expense.id)
+        .delete()
+        .then((doc) => _logger.i('Expense with ID ${expense.id} is deleted'))
+        .onError((error, stackTrace) {
+      // Show a snackbar with the error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete the expense: $error'),
+        ),
+      );
     });
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/expense.dart';
 
 class ExpenseItem extends StatelessWidget {
-  // final Function? onItemDismissed;
   final Expense expense;
   final VoidCallback? onDismissed;
 
@@ -16,7 +15,8 @@ class ExpenseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(expense.date.toString()),
+      // The key of this widget is the unique ID of the expense
+      key: Key(expense.id!),
       background: Container(
         color: Colors.grey,
         alignment: Alignment.centerRight,

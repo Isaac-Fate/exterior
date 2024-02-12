@@ -5,8 +5,18 @@ part 'expense.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class Expense {
+  /// The unique identifier of the expense.
+  /// This is set when the expense is created from a [DocumentSnapshot].
+  /// It is not included when the expense is converted to a JSON object.
+  @JsonKey(
+    includeToJson: false,
+  )
   String? id;
+
+  /// The title of the expense.
   final String title;
+
+  /// The amount of the expense.
   final double amount;
 
   /// The date of the expense.
@@ -30,9 +40,18 @@ class Expense {
   Map<String, dynamic> toJson() => _$ExpenseToJson(this);
 
   /// Creates an [Expense] from a [DocumentSnapshot].
+  /// The expense id is set to the document id.
   factory Expense.fromDocument(DocumentSnapshot document) {
+    // Get the data from the document
     final data = document.data() as Map<String, dynamic>;
-    return Expense.fromJson(data);
+
+    // Parse the data to create the expense
+    final expense = Expense.fromJson(data);
+
+    // Set the id of the expense
+    expense.id = document.id;
+
+    return expense;
   }
 
   /// Converts a [Timestamp] to a [DateTime].

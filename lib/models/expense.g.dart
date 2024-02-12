@@ -13,7 +13,6 @@ Expense _$ExpenseFromJson(Map<String, dynamic> json) => Expense(
     )..id = json['id'] as String?;
 
 Map<String, dynamic> _$ExpenseToJson(Expense instance) => <String, dynamic>{
-      'id': instance.id,
       'title': instance.title,
       'amount': instance.amount,
       'date': Expense.convertDateTimeToTimestamp(instance.date),
