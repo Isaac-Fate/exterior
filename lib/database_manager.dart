@@ -80,7 +80,7 @@ class DatabaseManager {
 
     // If the query snapshot is empty, return an empty list
     if (querySnapshot.docs.isEmpty) {
-      return (<Expense>[], null);
+      return (<Expense>[], lastDocument);
     }
 
     // Convert to the list of expenses

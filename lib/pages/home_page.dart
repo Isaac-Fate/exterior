@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -25,6 +26,109 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    child: const Text(
+                      'Exterior',
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'User:',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                _databaseManager.user.displayName ?? '',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(
+                          color: Colors.black,
+                          thickness: 2.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const ExpenseList(),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.09,
+              child: Column(
+                children: [
+                  const Divider(
+                    color: Colors.black,
+                    thickness: 2.0,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Daily Total:',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.05,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+                    child: GestureDetector(
+                      onTap: () {
+                        // FirebaseAuth.instance.signOut().then((_) {
+                        //   Get.offNamed('/login');
+                        // });
+                        FirebaseAuth.instance.signOut();
+                      },
+                      child: const Text(
+                        'Log Out',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -33,81 +137,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: const Icon(Icons.add),
       ),
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.1,
-                child: const Text(
-                  'Exterior',
-                  style: TextStyle(
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                      child: Row(
-                        children: [
-                          const Text(
-                            'User:',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            _databaseManager.user.displayName ?? '',
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(
-                      color: Colors.black,
-                      thickness: 2.0,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: const ExpenseList(),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.1,
-                child: Column(
-                  children: [
-                    Divider(
-                      color: Colors.black,
-                      thickness: 2.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                      child: Row(
-                        children: [
-                          const Text(
-                            'Daily Total:',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
     );
   }
 

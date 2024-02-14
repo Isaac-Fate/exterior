@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
+import '../database_manager.dart';
 import '../widgets/custom_theme_text_field.dart';
 
 enum LoginPageMode {
@@ -266,7 +267,11 @@ class _LoginPageState extends State<LoginPage> {
       // which means the user is successfully authenticated
       // Navigate to the home page
       if (user != null) {
-        _navigateToHomePage();
+        // Set up database manager
+        final databaseManager = DatabaseManager(user: user);
+
+        // Put the database manager into the GetX dependency injection system
+        Get.put(databaseManager);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

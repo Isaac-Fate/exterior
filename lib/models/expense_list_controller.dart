@@ -49,15 +49,13 @@ class ExpenseListController extends GetxController {
     // Get the expenses from the database
     final (expenses, lastDocument) = await _databaseManager.getExpenses(
       limit: batchSize,
-      lastDocument: _lastDocument,
+      lastDocument: null,
     );
 
     // Clear the list of expenses
     _expenses.clear();
 
-    // Clear the last document
-    _lastDocument = null;
-
+    // Add to the local list
     _expenses.addAll(expenses);
 
     // Update the last document
