@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../database_manager.dart';
+
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -24,6 +26,12 @@ class _SplashPageState extends State<SplashPage> {
         // Navigate to the login page if the user is not logged in
         Get.offAndToNamed('/login');
       } else {
+        // Set up a database manager
+        final databaseManager = DatabaseManager(user: user);
+
+        // Put the database manager into the GetX dependency manager
+        Get.put(databaseManager);
+
         // Navigate to the home page if the user is logged in
         Get.offAndToNamed('/home');
       }
