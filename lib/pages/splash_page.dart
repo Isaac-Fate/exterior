@@ -20,7 +20,7 @@ class _SplashPageState extends State<SplashPage> {
 
     _auth.authStateChanges().listen((User? user) async {
       // Delay for a little bit to show the splash screen
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       if (user == null) {
         // Navigate to the login page if the user is not logged in

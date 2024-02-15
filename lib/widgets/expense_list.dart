@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
+import '../database_manager.dart';
 import '../models/expense.dart';
 import './expense_item.dart';
 import './dashed_divider.dart';
@@ -22,6 +22,9 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   final _scrollController = ScrollController();
+
+  /// Database manager.
+  final _databaseManager = Get.find<DatabaseManager>();
 
   final _expenseListController = Get.find<ExpenseListController>();
   late final _expenses = _expenseListController.expenses;
@@ -48,20 +51,22 @@ class _ExpenseListState extends State<ExpenseList> {
                   expense.date.day != _expenses[index - 1].date.day)) {
             return Column(
               children: [
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                      child: Text('Date: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0,
-                          )),
-                    ),
-                    Text(
-                      DateFormat('yyyy-MM-dd').format(expense.date),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Date: ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      Text(
+                        DateFormat('yyyy-MM-dd').format(expense.date),
+                      ),
+                    ],
+                  ),
                 ),
                 const DashedDivider(),
                 ExpenseItem(
@@ -102,20 +107,6 @@ class _ExpenseListState extends State<ExpenseList> {
     });
 
     // Delete the expense from the database
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc('test')
-        .collection('Expenses')
-        .doc(expense.id)
-        .delete()
-        .then((doc) => _logger.i('Expense with ID ${expense.id} is deleted'))
-        .onError((error, stackTrace) {
-      // Show a snackbar with the error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete the expense: $error'),
-        ),
-      );
-    });
+    _databaseManager.deleteExpense(expense.id!);
   }
 }

@@ -24,84 +24,105 @@ class _HomePageState extends State<HomePage> {
   final _logger = Get.find<Logger>();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SafeArea(
-              child: Column(
+            const SafeArea(
+              child: Text(
+                'Exterior',
+                style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+              child: Row(
                 children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    child: const Text(
-                      'Exterior',
-                      style: TextStyle(
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  const Text(
+                    'User:',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'User:',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                _databaseManager.user.displayName ?? '',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(
-                          color: Colors.black,
-                          thickness: 2.0,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: const ExpenseList(),
+                  Text(
+                    _databaseManager.user.displayName ?? '',
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.09,
-              child: Column(
-                children: [
-                  const Divider(
-                    color: Colors.black,
-                    thickness: 2.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                    child: Row(
+            const Divider(
+              color: Colors.black,
+              thickness: 2.0,
+            ),
+            const Expanded(
+              child: ExpenseList(),
+            ),
+            const Divider(
+              color: Colors.black,
+              thickness: 2.0,
+            ),
+            Obx(() {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                child: Column(
+                  children: [
+                    // Daily total
+                    Row(
                       children: [
                         const Text(
                           'Daily Total:',
                           style: TextStyle(
-                            fontSize: 16.0,
                             fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          _expenseListController.dailyTotal.toStringAsFixed(2),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
+
+                    // Monthly total
+                    Row(
+                      children: [
+                        const Text(
+                          'Monthly Total:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          _expenseListController.monthlyTotal
+                              .toStringAsFixed(2),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.05,
               child: Row(
@@ -146,9 +167,12 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AddExpenseDialog(
-          onExpenseCreated: (expense) {
+          onExpenseCreated: (expense) async {
             try {
-              _expenseListController.addExpense(expense);
+              // Use the expense list controller to add the expense
+              await _expenseListController.addExpense(expense);
+
+              // Update the monthly total
             } catch (e) {
               _logger.e('Error adding expense: $e');
             }

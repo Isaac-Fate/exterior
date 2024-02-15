@@ -9,9 +9,17 @@ class ExpenseListController extends GetxController {
   DocumentSnapshot? _lastDocument;
   final _databaseManager = Get.find<DatabaseManager>();
 
-  List<Expense> get expenses => _expenses;
+  /// Daily total expenses.
+  final _dailyTotal = 0.0.obs;
 
-  addExpense(Expense expense) async {
+  /// Monthly total expenses.
+  final _monthlyTotal = 0.0.obs;
+
+  List<Expense> get expenses => _expenses;
+  double get dailyTotal => _dailyTotal.value;
+  double get monthlyTotal => _monthlyTotal.value;
+
+  Future<void> addExpense(Expense expense) async {
     // Add to the database and get the new expense ID
     final expenseId = await _databaseManager.addExpense(expense);
 
@@ -41,6 +49,9 @@ class ExpenseListController extends GetxController {
 
     // Update the last document
     _lastDocument = lastDocument;
+
+    // Update the total expenses
+    _updateTotalExpenses();
   }
 
   /// Refreshes the list of expenses
@@ -60,5 +71,30 @@ class ExpenseListController extends GetxController {
 
     // Update the last document
     _lastDocument = lastDocument;
+
+    // Update the total expenses
+    _updateTotalExpenses();
+  }
+
+  /// Updates the daily and monthly total expenses.
+  void _updateTotalExpenses() {
+    _updateDailyTotal();
+    _updateMonthlyTotal();
+  }
+
+  Future<void> _updateDailyTotal() async {
+    // Get the daily total from the database
+    final total = await _databaseManager.getDailyTotal();
+
+    // Set the daily total
+    _dailyTotal.value = total;
+  }
+
+  Future<void> _updateMonthlyTotal() async {
+    // Get the monthly total from the database
+    final total = await _databaseManager.getMonthlyTotal();
+
+    // Set the monthly total
+    _monthlyTotal.value = total;
   }
 }

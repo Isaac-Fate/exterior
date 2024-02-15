@@ -29,19 +29,28 @@ class ExpenseItem extends StatelessWidget {
         ),
       ),
       direction: DismissDirection.endToStart,
-      child: ListTile(
-        title: Text(
-          expense.title,
-          style: const TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 16.0,
-          ),
+
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 4.0),
+        child: Row(
+          children: [
+            Text(
+              expense.title,
+              style: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 16.0,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              expense.amount.toStringAsFixed(2),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+              ),
+            ),
+          ],
         ),
-        trailing: Text(expense.amount.toStringAsFixed(2),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0,
-            )),
       ),
       onDismissed: (direction) {
         onDismissed?.call();

@@ -100,4 +100,52 @@ class DatabaseManager {
     // Log
     _logger.i('Expense with ID $expenseId is deleted');
   }
+
+  Future<double> getDailyTotal() async {
+    // Get the current date
+    final now = DateTime.now();
+
+    // Get the start of the day
+    final startOfDay = DateTime(now.year, now.month, now.day);
+
+    // Get the end of the day
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    // Get the expenses
+    final querySnapshot = await expenseCollection
+        .where('date', isGreaterThanOrEqualTo: startOfDay)
+        .where('date', isLessThanOrEqualTo: endOfDay)
+        .get();
+
+    // Get the total
+    final total = querySnapshot.docs
+        .map((doc) => Expense.fromDocument(doc).amount)
+        .fold(0.0, (a, b) => a + b);
+
+    return total;
+  }
+
+  Future<double> getMonthlyTotal() async {
+    // Get the current date
+    final now = DateTime.now();
+
+    // Get the start of the month
+    final startOfMonth = DateTime(now.year, now.month, 1);
+
+    // Get the end of the month
+    final endOfMonth = DateTime(now.year, now.month + 1, 1);
+
+    // Get the expenses
+    final querySnapshot = await expenseCollection
+        .where('date', isGreaterThanOrEqualTo: startOfMonth)
+        .where('date', isLessThan: endOfMonth)
+        .get();
+
+    // Get the total
+    final total = querySnapshot.docs
+        .map((doc) => Expense.fromDocument(doc).amount)
+        .fold(0.0, (a, b) => a + b);
+
+    return total;
+  }
 }
