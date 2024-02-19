@@ -248,10 +248,16 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = true;
       });
 
+      // Email
+      final email = _emailController.text.trim();
+
+      // Password
+      final password = _passwordController.text;
+
       // Sign in with email and password
       final userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
 
       // Complete loading
@@ -261,9 +267,6 @@ class _LoginPageState extends State<LoginPage> {
 
       // Get the user
       final user = userCredential.user;
-
-      // Log
-      _logger.d('User: $user');
 
       // If the user is not null,
       // which means the user is successfully authenticated
@@ -316,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
       final email = _emailController.text.trim();
 
       // Password
-      final password = _emailController.text;
+      final password = _passwordController.text;
 
       // Username
       final username = _usernameController.text.trim();
