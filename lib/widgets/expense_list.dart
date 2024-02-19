@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import '../database_manager.dart';
+
 import '../models/expense.dart';
 import './expense_item.dart';
 import './dashed_divider.dart';
@@ -21,13 +21,13 @@ class ExpenseList extends StatefulWidget {
 }
 
 class _ExpenseListState extends State<ExpenseList> {
+  /// Expense controller.
+  final _expenseListController = Get.find<ExpenseListController>();
+
+  /// Scroll controller used in ListView.
   final _scrollController = ScrollController();
 
-  /// Database manager.
-  final _databaseManager = Get.find<DatabaseManager>();
-
-  final _expenseListController = Get.find<ExpenseListController>();
-  late final _expenses = _expenseListController.expenses;
+  /// Logger.
   final _logger = Get.find<Logger>();
 
   @override
@@ -41,50 +41,61 @@ class _ExpenseListState extends State<ExpenseList> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return ListView.builder(
-        controller: _scrollController,
-        itemCount: _expenses.length,
-        itemBuilder: (context, index) {
-          final expense = _expenses[index];
-          if (index == 0 ||
-              (expense.date.month != _expenses[index - 1].date.month ||
-                  expense.date.day != _expenses[index - 1].date.day)) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Date: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.0,
+      // Wrap with a MediaQuery to
+      // remove the whitesapce above the first item
+      // in the list view
+      return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+
+        // The list view of user's expenses
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: _expenseListController.expenses.length,
+          itemBuilder: (context, index) {
+            final expense = _expenseListController.expenses[index];
+            if (index == 0 ||
+                (expense.date.month !=
+                        _expenseListController.expenses[index - 1].date.month ||
+                    expense.date.day !=
+                        _expenseListController.expenses[index - 1].date.day)) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Date: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
                         ),
-                      ),
-                      Text(
-                        DateFormat('yyyy-MM-dd').format(expense.date),
-                      ),
-                    ],
+                        Text(
+                          DateFormat('yyyy-MM-dd').format(expense.date),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const DashedDivider(),
-                ExpenseItem(
-                  expense,
-                  onDismissed: () {
-                    _deleteExpenseAt(index);
-                  },
-                ),
-              ],
+                  const DashedDivider(),
+                  ExpenseItem(
+                    expense,
+                    onDismissed: () {
+                      _expenseListController.deleteExpenseAt(index);
+                    },
+                  ),
+                ],
+              );
+            }
+            return ExpenseItem(
+              expense,
+              onDismissed: () {
+                _expenseListController.deleteExpenseAt(index);
+              },
             );
-          }
-          return ExpenseItem(
-            expense,
-            onDismissed: () {
-              _deleteExpenseAt(index);
-            },
-          );
-        },
+          },
+        ),
       );
     });
   }
@@ -95,18 +106,5 @@ class _ExpenseListState extends State<ExpenseList> {
       _logger.i('Reached the end of the list. Loading more...');
       _expenseListController.loadExpenses();
     }
-  }
-
-  _deleteExpenseAt(int index) {
-    // The expense to delete
-    final expense = _expenses[index];
-
-    // Remove the expense from the list
-    setState(() {
-      _expenses.removeAt(index);
-    });
-
-    // Delete the expense from the database
-    _databaseManager.deleteExpense(expense.id!);
   }
 }

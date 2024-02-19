@@ -76,6 +76,20 @@ class ExpenseListController extends GetxController {
     _updateTotalExpenses();
   }
 
+  Future<void> deleteExpenseAt(int index) async {
+    // The expense to delete
+    final expense = _expenses[index];
+
+    // Remove the expense from the list
+    expenses.removeAt(index);
+
+    // Delete the expense from the database
+    await _databaseManager.deleteExpense(expense.id!);
+
+    // Update the total expenses
+    _updateTotalExpenses();
+  }
+
   /// Updates the daily and monthly total expenses.
   void _updateTotalExpenses() {
     _updateDailyTotal();

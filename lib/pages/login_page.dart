@@ -110,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                 CustomThemeTextField(
                   controller: _passwordController,
                   labelText: 'Password',
+                  obscureText: true,
                 ),
               ],
             ),
@@ -175,12 +176,17 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 CustomThemeTextField(
+                  controller: _usernameController,
+                  labelText: 'Username',
+                ),
+                CustomThemeTextField(
                   controller: _emailController,
                   labelText: 'Email',
                 ),
                 CustomThemeTextField(
                   controller: _passwordController,
                   labelText: 'Password',
+                  obscureText: true,
                 ),
               ],
             ),
@@ -233,10 +239,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ],
     );
-  }
-
-  _navigateToHomePage() {
-    Get.offAndToNamed('/home');
   }
 
   _login() async {
@@ -310,16 +312,34 @@ class _LoginPageState extends State<LoginPage> {
 
   _register() async {
     try {
-      _logger.d('Email: ${_emailController.text}');
+      // Email
+      final email = _emailController.text.trim();
+
+      // Password
+      final password = _emailController.text;
+
+      // Username
+      final username = _usernameController.text.trim();
+
+      // Register a new user with email and password
       final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
+
+      // The user object
       final user = userCredential.user;
 
-      _logger.d('User: $user');
+      if (user != null) {
+        // Set the user's name
+        await user.updateDisplayName(username);
 
-      if (user != null) {}
+        // Set up database manager
+        final databaseManager = DatabaseManager(user: user);
+
+        // Put the database manager into the GetX dependency injection system
+        Get.put(databaseManager);
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         // Show a snackbar

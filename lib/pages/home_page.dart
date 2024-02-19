@@ -15,10 +15,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _expenseListController = Get.put(ExpenseListController());
-
   /// Database manager.
   final DatabaseManager _databaseManager = Get.find<DatabaseManager>();
+
+  /// Expense list controller.
+  final _expenseListController = Get.put(ExpenseListController());
 
   /// Logger.
   final _logger = Get.find<Logger>();
@@ -44,37 +45,64 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-              child: Row(
-                children: [
-                  const Text(
-                    'User:',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Username
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'User: ',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _databaseManager.user.displayName ?? '',
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Sign out
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 0),
+                  child: GestureDetector(
+                    onTap: () {
+                      FirebaseAuth.instance.signOut();
+                    },
+                    child: const Text(
+                      'Log Out',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
-                  Text(
-                    _databaseManager.user.displayName ?? '',
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             const Divider(
               color: Colors.black,
               thickness: 2.0,
             ),
+
+            // The list of expenses
             const Expanded(
               child: ExpenseList(),
             ),
+
             const Divider(
               color: Colors.black,
               thickness: 2.0,
             ),
+
+            // Daily total and monthly total
             Obx(() {
               return Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
                 child: Column(
                   children: [
                     // Daily total
@@ -123,30 +151,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             }),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.05,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // FirebaseAuth.instance.signOut().then((_) {
-                        //   Get.offNamed('/login');
-                        // });
-                        FirebaseAuth.instance.signOut();
-                      },
-                      child: const Text(
-                        'Log Out',
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
           ],
         ),
       ),

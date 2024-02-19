@@ -13,12 +13,17 @@ class CustomThemeTextField extends StatelessWidget {
   /// The color of the text field when it has focus.
   final Color? focusColor;
 
+  /// Whether the text is obscure.
+  /// Often set true for password input.
+  final bool obscureText;
+
   const CustomThemeTextField({
     super.key,
     required this.controller,
     this.labelText,
     this.color,
     this.focusColor,
+    this.obscureText = false,
   });
 
   @override
@@ -32,6 +37,7 @@ class CustomThemeTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       cursorColor: actualFocusColor,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
